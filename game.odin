@@ -60,7 +60,56 @@ main :: proc() {
     py: f32 = 0.66
 
       for !rl.WindowShouldClose() {
+	frame_time := rl.GetFrameTime() 
+
 	// Input
+	move_speed := frame_time * 5.0 // constant value in squares/second
+	rot_speed := frame_time * 3.0 // constant value in radians/second
+
+	if rl.IsKeyDown(.W) {
+	    if world_map[int(player.pos.x + player.dir.x * move_speed)][int(player.pos.y)] == 0 {
+		player.pos.x += player.dir.x * move_speed
+	    }
+	    
+	    if world_map[int(player.pos.x)][int(player.pos.y + player.dir.y * move_speed)] == 0 {
+		player.pos.y += player.dir.y * move_speed
+	    }
+
+	}
+
+	if rl.IsKeyDown(.S) {
+	    if world_map[int(player.pos.x - player.dir.x * move_speed)][int(player.pos.y)] == 0 {
+		player.pos.x -= player.dir.x * move_speed
+	    }
+	    
+	    if world_map[int(player.pos.x)][int(player.pos.y - player.dir.y * move_speed)] == 0 {
+		player.pos.y -= player.dir.y * move_speed
+	    }
+	}
+
+	if rl.IsKeyDown(.D) {
+	    // Both camera direciotn and camera plane must be rotated
+	    old_dir_x := player.dir.x 
+	    player.dir.x = player.dir.x * math.cos(-rot_speed) - player.dir.y * math.sin(-rot_speed)
+	    player.dir.y = old_dir_x * math.sin(-rot_speed) + player.dir.y * math.cos(-rot_speed)
+
+	    old_plane_x := px
+	    px = px * math.cos(-rot_speed) - py * math.sin(-rot_speed)
+	    py = old_plane_x * math.sin(-rot_speed) + py * math.cos(-rot_speed)
+
+	}
+
+	if rl.IsKeyDown(.A) {
+	    // Both camera direciotn and camera plane must be rotated
+	    old_dir_x := player.dir.x 
+	    player.dir.x = player.dir.x * math.cos(rot_speed) - player.dir.y * math.sin(rot_speed)
+	    player.dir.y = old_dir_x * math.sin(rot_speed) + player.dir.y * math.cos(rot_speed)
+
+	    old_plane_x := px
+	    px = px * math.cos(rot_speed) - py * math.sin(rot_speed)
+	    py = old_plane_x * math.sin(rot_speed) + py * math.cos(rot_speed)
+
+	}
 
 	// Update
 	for x in 0..<WINDOW_WIDTH {
