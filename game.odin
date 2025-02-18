@@ -215,7 +215,7 @@ main :: proc() {
 		case 2: color = rl.GREEN
 		case 3: color = rl.BLUE
 		case 4: color = rl.WHITE
-		case 0: color = rl.YELLOW
+		case 5: color = rl.YELLOW
 		}
 
 		draw_vertical_line(x, draw_start, draw_end, color)
@@ -230,7 +230,8 @@ main :: proc() {
 	rl.ClearBackground(rl.BLACK)
 
 	if gs.editor_mode do render_editor(&es)
-	rl.DrawFPS(10,10)
+
+	if !gs.editor_mode do rl.DrawFPS(10,10)
 
     }
 }
@@ -243,6 +244,7 @@ update_editor :: proc(editor: ^Editor_State) {
 	if rl.IsKeyPressed(rl.KeyboardKey(i + int(rl.KeyboardKey.ZERO))) do editor.brush_value = i
     }
 
+
     // Get mouse position and convert to grid coordinates
     mouse_pos := rl.GetMousePosition()
     grid_x := int(mouse_pos.x) / GRID_CELL_SIZE
@@ -251,6 +253,11 @@ update_editor :: proc(editor: ^Editor_State) {
     // Place tile if click is within map bounds
     if rl.IsMouseButtonDown(.LEFT) && grid_x >= 0 && grid_x < MAP_SIZE && grid_y >= 0 && grid_y < MAP_SIZE {
 	editor.e_map[grid_x][grid_y] = editor.brush_value
+    }
+
+    // Turn a tile into a blank space
+    if rl.IsMouseButtonDown(.RIGHT) && grid_x >= 0 && grid_x < MAP_SIZE && grid_y >= 0 && grid_y < MAP_SIZE {
+	editor.e_map[grid_x][grid_y] = 0
     }
 
     // Export to console  TODO: Export to a different format like JSON perhaps later for multiple levels?
@@ -287,8 +294,8 @@ render_editor :: proc(editor: ^Editor_State) {
 
     // Show current brush value
     brush_string := fmt.ctprintf("Brush: %d (0-5)", editor.brush_value)
-    rl.DrawText(brush_string, 10, 30, 20, rl.WHITE)
-    rl.DrawText("F1: Toggle Editor, F2: Export, 0-5: Set Brush", 10, 50, 20, rl.WHITE)
+    rl.DrawText(brush_string, 10, WINDOW_HEIGHT - 30, 20, rl.WHITE)
+    rl.DrawText("SPACE: Toggle Editor, E: Export, 0-5: Set Brush", 10, WINDOW_HEIGHT - 50, 20, rl.WHITE)
 }
 
 export_map :: proc(world: [MAP_SIZE][MAP_SIZE]int) {
