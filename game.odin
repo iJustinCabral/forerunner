@@ -128,9 +128,8 @@ main :: proc() {
 	    side_dist_y: f32
 
 	    // Lenth of ray from one x or y-side to next x or y side
-	    delta_dist_x := math.sqrt_f32(1 + (ray_dir_y * ray_dir_y) / (ray_dir_x * ray_dir_y))
-	    delta_dist_y := math.sqrt_f32(1 + (ray_dir_x * ray_dir_x) / (ray_dir_y * ray_dir_y))
-
+	    delta_dist_x := abs(1 / ray_dir_x) < 0.0001 ? 1e10 : abs(1 / ray_dir_x)
+	    delta_dist_y := abs(1 / ray_dir_y) < 0.0001 ? 1e10 : abs(1 / ray_dir_y)
 	    perp_wall_dist: f32
 
 	    // What direction to step in x or y direction (either +1 or -1)
